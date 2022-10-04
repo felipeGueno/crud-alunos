@@ -59,7 +59,7 @@ public class AlunoController {
 
     @GetMapping("/idades")
     @ResponseStatus(HttpStatus.OK)
-    public List<Aluno> buscaPorIdade(@RequestParam Long idade) {
+    public List<Aluno> buscaPorIdade(@RequestParam Long idade) throws Exception {
         return alunoService.buscaPorIdade(idade);
     }
 

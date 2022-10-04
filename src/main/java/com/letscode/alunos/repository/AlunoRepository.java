@@ -14,7 +14,6 @@ public interface AlunoRepository extends JpaRepository<Aluno, Long> {
             nativeQuery = true)
     List<Aluno> findByNome(@Param("nome") String nome);
 
-
     List<Aluno> findAllByIdade(Long idade);
 
     /**
@@ -25,6 +24,8 @@ public interface AlunoRepository extends JpaRepository<Aluno, Long> {
     Aluno findByDocumento(String documento);
 
     Aluno findByNomeAndIdade(String nome, Long idade);
+
+
 
     Optional<Aluno> findByNomeAndIdadeAndDocumento(String nome, Long idade, String documento);
 

@@ -62,8 +62,12 @@ public class AlunoServiceImpl implements AlunoService {
     }
 
     @Override
-    public List<Aluno> buscaPorIdade(Long idade) {
-        return alunoRepository.findAllByIdade(idade);
+    public List<Aluno> buscaPorIdade(Long idade) throws Exception {
+        List<Aluno> byIdade = alunoRepository.findAllByIdade(idade);
+        if (byIdade.isEmpty()){
+            throw new Exception("Aluno não encontrado");
+        }
+        return byIdade;
     }
 
     @Override

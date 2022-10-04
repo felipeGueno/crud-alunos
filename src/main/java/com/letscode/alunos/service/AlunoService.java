@@ -13,7 +13,7 @@ public interface AlunoService {
 
     List<Aluno> buscaPorNome(String nome);
 
-    List<Aluno> buscaPorIdade(Long idade);
+    List<Aluno> buscaPorIdade(Long idade) throws Exception;
 
     List<Aluno> filter(String nome, Long idade, String documento);
 }

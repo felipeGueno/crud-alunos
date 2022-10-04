@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -64,6 +65,111 @@ class AlunoServiceImplTest {
     }
 
     @Test
+    @DisplayName("Deve deletar um aluno")
+    void deveDeletarUmAluno() throws Exception {
+
+//        Mockito.doReturn(aluno).when(alunoRepository.findById(anyLong()));
+
+//        BDDMockito.given(alunoRepository.findById(anyLong())).willReturn(Optional.of(aluno));
+//        BDDMockito.then(alunoRepository.findById(any())).should().get()
+
+        Mockito.when(alunoRepository.findById(anyLong()))
+                .thenReturn(Optional.of(aluno));
+
+        Mockito.doNothing().when(alunoRepository).deleteById(anyLong());
+
+        var resultado = alunoService.delete(aluno.getId());
+
+        Assertions.assertEquals("Aluno deletado", resultado);
+    }
+
+    @Test
+    @DisplayName("Deve testar a busca por nome")
+    void deveTestarABuscaPorNome() {
+        Mockito.when(alunoRepository.findByNome(anyString())).thenReturn(List.of(aluno));
+
+        List<Aluno> alunos = alunoService.buscaPorNome(aluno.getNome());
+        Assertions.assertEquals("Aluno Teste", alunos.get(0).getNome());
+    }
+
+    @Test
+    @DisplayName("Deve buscar o aluno somento pelo nome")
+    void deveBuscarOAlunoSomentoPeloNome() {
+        Mockito.when(alunoRepository.findByNome(anyString())).thenReturn(List.of(aluno));
+        List<Aluno> alunos = alunoService.filter(aluno.getNome(), null, null);
+        Assertions.assertEquals("Aluno Teste", alunos.get(0).getNome());
+    }
+
+    @Test
+    @DisplayName("Deve alterar o nome do aluno")
+    void deveAlterarONomeDoAluno() throws Exception {
+
+        Mockito.when(alunoRepository.findById(anyLong()))
+                .thenReturn(Optional.of(aluno));
+
+        Mockito.when(alunoRepository.save(any())).thenReturn(aluno);
+
+        var resultado = alunoService.alterarAluno(aluno.getId(), "Superman");
+
+        Assertions.assertEquals("Superman", resultado.getNome());
+    }
+
+    /** Criado por Felipe Gueno*/
+    @Test
+    @DisplayName("Deve buscar por idade")
+    public void deveBuscarPorIdade() throws Exception {
+        List<Aluno> alunos = Arrays.asList(aluno);
+
+        Mockito.when(alunoRepository.findAllByIdade(18L)).thenReturn(alunos);
+
+        List<Aluno> resultado = alunoService.buscaPorIdade(18L);
+
+        Assertions.assertEquals(alunos, resultado);
+
+    }
+
+    /** Criado por Felipe Gueno*/
+
+    @Test
+    @DisplayName("Deve buscar todos os aluno")
+    public void deveBuscarTodosOsAluno(){
+        List<Aluno> alunos = Arrays.asList(aluno);
+
+        Mockito.when(alunoRepository.findAll()).thenReturn(alunos);
+
+        List<Aluno> resultado = alunoService.buscaTodos();
+
+        Assertions.assertEquals(alunos, resultado);
+
+    }
+
+    /** Criado por Felipe Gueno*/
+
+    @Test
+    @DisplayName("Deve filtrar por nome, idade e documento")
+    public void deveFiltrarPorNomeIdadeEDocumento(){
+
+        List<Aluno> alunos = Arrays.asList(aluno);
+
+        Mockito.when(alunoRepository.findByNomeAndIdadeAndDocumento(aluno.getNome(), aluno.getIdade(), aluno.getDocumento())).thenReturn(Optional.of(aluno));
+
+        List<Aluno> resultadoDoFiltro = alunoService.filter(aluno.getNome(), aluno.getIdade(), aluno.getDocumento());
+
+        Assertions.assertEquals(alunos, resultadoDoFiltro);
+
+    }
+    /** Criado por Felipe Gueno*/
+    @Test
+    @DisplayName("Deve retornar excecao quando buscar por idade e nao encontrar")
+    public void deveRetornarExcecaoQuandoBuscarPorIdadeENaoEncontrar() throws Exception {
+
+        Exception exception = assertThrows(Exception.class, () -> alunoService.buscaPorIdade(15L));
+
+        Assertions.assertEquals("Aluno não encontrado", exception.getMessage());
+
+    }
+
+    @Test
     @DisplayName("Deve buscar aluno pelo id")
     void deveBuscarAlunoPeloId() throws Exception {
         //Simulou o comportamento do repository
@@ -113,38 +219,6 @@ class AlunoServiceImplTest {
 //        Assertions.assertEquals("Aluno Teste", resultado.get(0).getNome()); // nunca executa
     }
 
-    @Test
-    @DisplayName("Deve deletar um aluno")
-    void deveDeletarUmAluno() throws Exception {
-
-//        Mockito.doReturn(aluno).when(alunoRepository.findById(anyLong()));
-
-//        BDDMockito.given(alunoRepository.findById(anyLong())).willReturn(Optional.of(aluno));
-//        BDDMockito.then(alunoRepository.findById(any())).should().get()
-
-        Mockito.when(alunoRepository.findById(anyLong()))
-                .thenReturn(Optional.of(aluno));
-
-        Mockito.doNothing().when(alunoRepository).deleteById(anyLong());
-
-        var resultado = alunoService.delete(aluno.getId());
-
-        Assertions.assertEquals("Aluno deletado", resultado);
-    }
-
-    @Test
-    @DisplayName("Deve alterar o nome do aluno")
-    void deveAlterarONomeDoAluno() throws Exception {
-
-        Mockito.when(alunoRepository.findById(anyLong()))
-                .thenReturn(Optional.of(aluno));
-
-        Mockito.when(alunoRepository.save(any())).thenReturn(aluno);
-
-        var resultado = alunoService.alterarAluno(aluno.getId(), "Superman");
-
-        Assertions.assertEquals("Superman", resultado.getNome());
-    }
 
 
     @Test
@@ -165,22 +239,7 @@ class AlunoServiceImplTest {
         Assertions.assertEquals("Aluno não foi encontrado", exception.getMessage());
     }
 
-    @Test
-    @DisplayName("Deve testar a busca por nome")
-    void deveTestarABuscaPorNome() {
-        Mockito.when(alunoRepository.findByNome(anyString())).thenReturn(List.of(aluno));
 
-        List<Aluno> alunos = alunoService.buscaPorNome(aluno.getNome());
-        Assertions.assertEquals("Aluno Teste", alunos.get(0).getNome());
-    }
-
-    @Test
-    @DisplayName("Deve buscar o aluno somento pelo nome")
-    void deveBuscarOAlunoSomentoPeloNome() {
-        Mockito.when(alunoRepository.findByNome(anyString())).thenReturn(List.of(aluno));
-        List<Aluno> alunos = alunoService.filter(aluno.getNome(), null, null);
-        Assertions.assertEquals("Aluno Teste", alunos.get(0).getNome());
-    }
 
 
 }
